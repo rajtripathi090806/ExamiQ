@@ -1,0 +1,29 @@
+
+    tbl_exams
+       |
+  -----------------
+  |               |
+Draft         Published
+                  |
+           (derived status)
+                  |
+           --------------------
+           |      |           |
+         Live   Upcoming   Completed
+
+
+
+
+
+
+tbl_student_exam_history
+           |
+    ------------------
+    |                |
+Attempted         Published
+                     |
+               (derived status)
+                     |
+            -------------------
+            |        |        |
+          Live   Upcoming   Missed

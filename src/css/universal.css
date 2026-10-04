@@ -1,0 +1,25 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: poppins;
+    font-size: 14px;
+    letter-spacing: 1.2px;
+    user-select: none;
+}
+
+.loader {
+    position: fixed;
+    z-index: 999;
+    height: 100dvh;
+    width: 100dvw;
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.wrapper {
+    /* overflow-x: hidden; */
+    min-height: 100dvh;
+    display: grid;
+    grid-template-rows: auto 1fr;
+}

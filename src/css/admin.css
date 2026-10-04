@@ -1,0 +1,20 @@
+
+main {
+    min-width: 0;
+}
+
+main .content-header {
+    margin-bottom: 25px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 25px;
+}
+
+.profile-photo {
+    height: 30px;
+    width: 30px;
+    object-fit: cover;
+    border-radius: 50%;
+}

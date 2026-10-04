@@ -1,0 +1,176 @@
+
++---------+
+| student |
++---------+
+
+
+exams.php - (Live)
+
+    examId | S.No. | Exam Name | Subject | Start Timestamp | End Timestamp | Exam Duration | Actions
+
+    SELECT
+        e.examId,
+        e.examName,
+        bs.subName,
+        e.startTimestamp,
+        e.endTimestamp,
+        e.examDuration
+    FROM tbl_exams e
+    JOIN tbl_batch_subjects bs ON bs.batchSubId = e.batchSubId
+    JOIN tbl_student_exam_history seh ON seh.examId = e.examId
+    WHERE
+        seh.stuId = ?
+        AND seh.status = 'Published'
+        AND e.startTimestamp < NOW()
+        AND e.endTimestamp >= NOW()
+    ORDER BY e.startTimestamp ASC;
+
+
+
+exams.php - (Upcoming)
+
+    examId | S.No. | Exam Name | Subject | Start Timestamp | End Timestamp | Exam Duration
+
+    SELECT
+        e.examId,
+        e.examName,
+        bs.subName,
+        e.startTimestamp,
+        e.endTimestamp,
+        e.examDuration
+    FROM tbl_exams e
+    JOIN tbl_batch_subjects bs ON bs.batchSubId = e.batchSubId
+    JOIN tbl_student_exam_history seh ON seh.examId = e.examId
+    WHERE
+        seh.stuId = ?
+        AND seh.status = 'Published'
+        AND e.startTimestamp > NOW()
+    ORDER BY e.startTimestamp ASC;
+
+
+
+exams.php - (Attempted) = Results
+
+    resId | S.No. | Exam Name | Batch | Subject | Attempt Timestamp | Attempt Duration | Max Total | Obt Total | Submission Type | Actions
+
+    SELECT
+        r.resId,
+        e.examName,
+        b.batchName,
+        bs.subName,
+        r.startedAt,
+        r.endedAt,
+        SUM(q.maxMarks) AS maxTotal,
+        SUM(a.obtMarks) AS obtTotal,
+        r.submissionType
+    FROM tbl_results r
+    JOIN tbl_exams e ON e.examId = r.examId
+    JOIN tbl_batches b ON b.batchId = e.batchId
+    JOIN tbl_batch_subjects bs ON bs.batchSubId = e.batchSubId
+    JOIN tbl_questions q ON q.examId = e.examId
+    JOIN tbl_answers a
+        ON a.quesId = q.quesId
+        AND a.stuId = r.stuId
+    JOIN tbl_student_exam_history seh
+        ON seh.examId = r.examId
+        AND seh.stuId = r.stuId
+    WHERE
+        r.stuId = ?
+        AND seh.status = 'Attempted'
+    GROUP BY
+        r.resId,
+        e.examName,
+        b.batchName,
+        bs.subName,
+        r.startedAt,
+        r.endedAt,
+        r.submissionType
+    ORDER BY r.resId DESC;
+
+
+
+exams.php - (Missed)
+
+    examId | S.No. | Exam Name | Batch | Subject | Start Timestamp | End Timestamp | Exam Duration | Actions
+
+    SELECT
+        e.examId,
+        e.examName,
+        b.batchName,
+        bs.subName,
+        e.startTimestamp,
+        e.endTimestamp,
+        e.examDuration
+    FROM tbl_exams e
+    JOIN tbl_batches b ON b.batchId = e.batchId
+    JOIN tbl_batch_subjects bs ON bs.batchSubId = e.batchSubId
+    JOIN tbl_student_exam_history seh ON seh.examId = e.examId
+    WHERE
+        seh.stuId = ?
+        AND seh.status = 'Published'
+        AND e.endTimestamp < NOW()
+    ORDER BY e.startTimestamp DESC;
+
+
+
+results.php
+
+    resId | S.No. | Exam Name | Batch | Subject | Attempt Timestamp | Attempt Duration | Max Total | Obt Total | Submission Type | Actions
+
+    SELECT
+        r.resId,
+        e.examName,
+        b.batchName,
+        bs.subName,
+        r.startedAt,
+        r.endedAt,
+        SUM(q.maxMarks) AS maxTotal,
+        SUM(a.obtMarks) AS obtTotal,
+        r.submissionType
+    FROM tbl_results r
+    JOIN tbl_exams e ON e.examId = r.examId
+    JOIN tbl_batches b ON b.batchId = e.batchId
+    JOIN tbl_batch_subjects bs ON bs.batchSubId = e.batchSubId
+    JOIN tbl_questions q ON q.examId = e.examId
+    JOIN tbl_answers a
+        ON a.quesId = q.quesId
+        AND a.stuId = r.stuId
+    JOIN tbl_student_exam_history seh
+        ON seh.examId = r.examId
+        AND seh.stuId = r.stuId
+    WHERE
+        r.stuId = ?
+        AND seh.status = 'Attempted'
+    GROUP BY
+        r.resId,
+        e.examName,
+        b.batchName,
+        bs.subName,
+        r.startedAt,
+        r.endedAt,
+        r.submissionType
+    ORDER BY r.resId DESC;
+
+
+
+grievances.php
+
+    resId | Griev Id | Griev Date | Exam Name | Batch | Subject | Grievance Statement | Status | Authority Remarks | Action
+
+    SELECT
+        r.resId,
+        g.grievId,
+        g.grievDate,
+        e.examName,
+        b.batchName,
+        bs.subName,
+        g.grievStatement,
+        g.status,
+        g.authorityRemarks
+    FROM tbl_results r
+    JOIN tbl_grievances g ON g.resId = r.resId
+    JOIN tbl_exams e ON e.examId = r.examId
+    JOIN tbl_batches b ON b.batchId = e.batchId
+    JOIN tbl_batch_subjects bs ON bs.batchSubId = e.batchSubId
+    WHERE r.stuId = ?
+    ORDER BY g.grievId DESC;

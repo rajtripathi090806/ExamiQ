@@ -1,0 +1,88 @@
+
+tbl_users
+    userId
+    username
+    emailId
+    password
+    role (Student / Exam Coordinator / Admin / Super Admin)
+    profilePhto
+
+tbl_batches
+    batchId
+    batchName
+    onPromotion
+
+tbl_batch_subjects
+    batchSubId
+    batchId
+    subName
+
+tbl_students
+    stuId
+    userId
+    batchId
+    gender (Male / Female / Other)
+    contactNo
+
+tbl_exams
+    examId
+    examName
+    batchId
+    subId
+    startTimestamp
+    endTimestamp
+    examDuration
+    examStatus (Draft / Published)
+    createdBy (userId)
+
+tbl_questions
+    quesId
+    examId
+    quesType (MCQ - Single Correct / Very Short Answer / Short Answer / Long Answer)
+    maxMarks
+    question
+    createdBy (userId)
+
+tbl_mcq_options
+    optId
+    quesId
+    optValue
+    isCorrect (True / False)
+
+tbl_answers
+    ansId
+    stuId
+    quesId
+    stuAnswer
+    obtMarks
+    aiRemarks
+    authorityRemarks
+
+tbl_results
+    resId
+    stuId
+    examId
+    startedAt
+    endedAt
+    submissionType (Rule Violations / Time Ended / Manual Submit)
+
+tbl_grievances
+    grievId
+    resId
+    grievDate
+    grievStatement
+    grievStatus (Pending / Under Review / Resolved / Rejected)
+    authorityRemarks
+
+tbl_student_exam_history
+    id
+    stuId
+    batchId
+    examId
+    status
+
+tbl_assigned_coordinators
+    id
+    userId
+    batchId
+    subId

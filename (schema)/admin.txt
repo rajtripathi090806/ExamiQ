@@ -1,0 +1,119 @@
+
++-------+
+| admin |
++-------+
+
+
+
+students.php
+
+    Stu Id | Student's Name | Batch | Gender | Email Id | Contact No. | Actions
+
+    SELECT
+        s.stuId,
+        u.username,
+        b.batchName,
+        s.gender,
+        u.emailId,
+        s.contactNo
+    FROM tbl_students s
+    JOIN tbl_users u ON u.userId = s.userId
+    JOIN tbl_batches b ON b.batchId = s.batchId
+    ORDER BY s.stuId DESC;
+
+
+
+exams.php
+
+    examId | S.No. | Exam Name | Batch | Subject | Start Timestamp | End Timestamp | Exam Duration | Exam Status | Created By | Actions
+
+    SELECT 
+        e.examId,
+        e.examName,
+        b.batchName,
+        bs.subName,
+        e.startTimestamp,
+        e.endTimestamp,
+        e.examDuration,
+        u.username AS createdBy,
+
+        CASE
+            WHEN e.examStatus = 'Draft' THEN 'Draft'
+            WHEN e.examStatus = 'Published' AND e.startTimestamp <= NOW() AND e.endTimestamp > NOW() THEN 'Live'
+            WHEN e.examStatus = 'Published' AND e.startTimestamp > NOW() THEN 'Upcoming'
+            WHEN e.examStatus = 'Published' AND e.endTimestamp <= NOW() THEN 'Completed'
+        END AS displayStatus
+
+    FROM tbl_exams e
+    JOIN tbl_batches b ON b.batchId = e.batchId
+    JOIN tbl_batch_subjects bs ON bs.batchSubId = e.batchSubId
+    LEFT JOIN tbl_users u ON u.userId = e.createdBy
+    ORDER BY e.examId DESC;
+
+
+
+results.php
+
+    resId | S.No. | Exam Name | Batch | Subject | Student's Name | Attempt Timestamp | Attempt Duration | Max Total | Obt Total | Submission Type | Actions
+
+    SELECT
+        r.resId,
+        e.examName,
+        b.batchName,
+        bs.subName,
+        u.username,
+        r.startedAt,
+        r.endedAt,
+        SUM(q.maxMarks) AS maxTotal,
+        SUM(a.obtMarks) AS obtTotal,
+        r.submissionType
+    FROM tbl_results r
+    JOIN tbl_exams e ON e.examId = r.examId
+    JOIN tbl_batches b ON b.batchId = e.batchId
+    JOIN tbl_batch_subjects bs ON bs.batchSubId = e.batchSubId
+    JOIN tbl_users u ON u.userId = r.stuId
+    JOIN tbl_questions q ON q.examId = e.examId
+    JOIN tbl_answers a
+        ON a.quesId = q.quesId
+        AND a.stuId = r.stuId
+    JOIN tbl_student_exam_history seh
+        ON seh.examId = r.examId
+        AND seh.stuId = r.stuId
+    WHERE
+        seh.status = 'Attempted'
+    GROUP BY
+        r.resId,
+        e.examName,
+        b.batchName,
+        bs.subName,
+        u.username,
+        r.startedAt,
+        r.endedAt,
+        r.submissionType
+    ORDER BY r.resId DESC;
+
+
+
+grievances.php
+
+    resId | Griev Id | Griev Date | Exam Name | Batch | Subject | Student's Name | Grievance Statement | Status | Authority Remarks | Action
+
+    SELECT
+        r.resId,
+        g.grievId,
+        g.grievDate,
+        e.examName,
+        b.batchName,
+        bs.subName,
+        u.username,
+        g.grievStatement,
+        g.status,
+        g.authorityRemarks
+    FROM tbl_results r
+    JOIN tbl_grievances g ON g.resId = r.resId
+    JOIN tbl_exams e ON e.examId = r.examId
+    JOIN tbl_batches b ON b.batchId = e.batchId
+    JOIN tbl_batch_subjects bs ON bs.subId = e.subId
+    JOIN tbl_students stu ON stu.stuId = r.stuId
+    JOIN tbl_users u ON u.userId = stu.userId
+    ORDER BY g.grievId DESC;
